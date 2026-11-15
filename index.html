@@ -29,6 +29,11 @@ h1{font-size:2.2rem;line-height:1;margin:6px 0 4px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
 .day h2{margin:0;font-size:1.6rem}
 .day ul{margin:8px 0 14px;padding-left:18px;color:var(--muted)}
+.exl{margin:10px 0 12px}
+.exi{display:flex;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.exi:last-child{border:none}
+.exi .fig{width:110px;flex:none;margin:0}
+.en{font-weight:600}.es{color:var(--muted);font-size:.9rem}
 .last{font-size:.9rem;color:var(--muted);margin:0 0 12px}
 .btn{display:block;width:100%;border:none;border-radius:14px;padding:15px;font:700 1.15rem "Barlow Condensed",sans-serif;background:var(--accent);color:#fff;cursor:pointer}
 .btn.ghost{background:var(--chip);color:var(--ink)}
@@ -174,9 +179,11 @@ function draw(f,t){const a=A[f.k],P={};J.forEach(j=>P[j]=lerp(a.a[j],a.b[j],t));
  f.near.setAttribute("d",L("N","P")+" "+L("N","E1","W1")+" "+L("P","K1","A1"));f.far.setAttribute("d",L("N","E2","W2")+" "+L("P","K2","A2"));
  f.head.setAttribute("cx",P.H[0]);f.head.setAttribute("cy",P.H[1]);
  f.dbs.innerHTML=a.db.map(i=>{const w=P["W"+i];return `<rect class="db" x="${w[0]-9}" y="${w[1]-4}" width="18" height="8" rx="3"/>`}).join("")}
-let fig=null;const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let fig=null,figs=[];const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function mk(sv,k){return {k,near:sv.querySelector(".near"),far:sv.querySelector(".far"),head:sv.querySelector(".hd"),dbs:sv.querySelector(".dbs")}}
 function mountFig(el,k){const sv=el.querySelector("svg");fig={k,near:sv.querySelector(".near"),far:sv.querySelector(".far"),head:sv.querySelector(".hd"),dbs:sv.querySelector(".dbs")};draw(fig,reduce?1:0)}
-function tick(ts){if(fig&&!reduce){let x=(ts/1000%2.6)/2.6;let t=x<.45?x/.45:x<.55?1:x<.95?1-(x-.55)/.4:0;draw(fig,t*t*(3-2*t))}requestAnimationFrame(tick)}
+function ease(s){let x=(s%2.6)/2.6;let t=x<.45?x/.45:x<.55?1:x<.95?1-(x-.55)/.4:0;return t*t*(3-2*t)}
+function tick(ts){if(!reduce){const s=ts/1000;if(fig)draw(fig,ease(s));else figs.forEach((f,i)=>draw(f,ease(s+i*.35)))}requestAnimationFrame(tick)}
 requestAnimationFrame(tick);
 
 // storage
@@ -187,12 +194,13 @@ const fmt=d=>new Date(d).toLocaleDateString("tr-TR",{day:"numeric",month:"long",
 function lastFor(day,i){for(let j=hist.length-1;j>=0;j--)if(hist[j].day===day&&hist[j].ex[i])return hist[j].ex[i];return null}
 
 // program screen
-function renderDays(){const el=document.getElementById("days");el.innerHTML="";
+function renderDays(){const el=document.getElementById("days");el.innerHTML="";figs=[];
  for(const [id,d] of Object.entries(days)){const last=hist.filter(h=>h.day===id).pop();
   const c=document.createElement("div");c.className="card day";
-  c.innerHTML=`<h2 class="cond">${d.t}</h2><ul>${d.ex.map(e=>`<li>${e.n} · ${e.s}×${e.r}</li>`).join("")}</ul>
+  c.innerHTML=`<h2 class="cond">${d.t}</h2><div class="exl">${d.ex.map(e=>`<div class="exi">${figSVG(e.k)}<div><div class="en">${e.n}</div><div class="es">${e.s} set × ${e.r} tekrar</div></div></div>`).join("")}</div>
    <p class="last">${last?"Son: "+fmt(last.date):"Henüz yapılmadı"}</p><button class="btn">Başla</button>`;
-  c.querySelector("button").onclick=()=>start(id);el.appendChild(c)}}
+  c.querySelector("button").onclick=()=>start(id);el.appendChild(c);
+  c.querySelectorAll(".exi").forEach((x,i)=>{const f=mk(x.querySelector("svg"),d.ex[i].k);figs.push(f);draw(f,reduce?1:0)})}}
 
 // workout
 let W=null;
