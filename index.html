@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F6FEB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Antrenman">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Antrenman</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1F4;--surface:#FFF;--ink:#16202B;--muted:#5B6672;--line:#D5DBE2;--accent:#1F6FEB;--done:#2E8B57;--chip:#E3E9F0;
+ --top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#121821;--surface:#1B2430;--ink:#E8EDF2;--muted:#98A4B1;--line:#2C3846;--accent:#5B9BFF;--done:#4CC38A;--chip:#243041}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Barlow",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.45;overscroll-behavior:none}
+.cond{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700}
+.screen{position:fixed;inset:0;overflow-y:auto;padding:calc(var(--top) + 16px) 16px calc(var(--bot) + 90px)}
+.screen[hidden]{display:none}
+.wrap{max-width:560px;margin:0 auto}
+h1{font-size:2.2rem;line-height:1;margin:6px 0 4px}
+.sub{color:var(--muted);margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.day h2{margin:0;font-size:1.6rem}
+.day ul{margin:8px 0 14px;padding-left:18px;color:var(--muted)}
+.last{font-size:.9rem;color:var(--muted);margin:0 0 12px}
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:15px;font:700 1.15rem "Barlow Condensed",sans-serif;background:var(--accent);color:#fff;cursor:pointer}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+.btn:focus-visible,.tb button:focus-visible,.step:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.tb{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--surface);border-top:1px solid var(--line);padding-bottom:var(--bot);z-index:20}
+.tb button{flex:1;background:none;border:none;padding:10px 0 12px;color:var(--muted);font:600 .8rem "Barlow",sans-serif;cursor:pointer}
+.tb button span{display:block;font-size:1.35rem;line-height:1.2}
+.tb button[aria-current="page"]{color:var(--accent)}
+/* workout */
+#wk{position:fixed;inset:0;background:var(--bg);z-index:30;display:flex;flex-direction:column;padding:calc(var(--top) + 12px) 16px calc(var(--bot) + 16px)}
+#wk[hidden]{display:none}
+.wkTop{display:flex;align-items:center;gap:10px}
+.x{background:var(--chip);border:none;border-radius:50%;width:38px;height:38px;font-size:1.1rem;color:var(--ink);cursor:pointer}
+.bar{flex:1;height:6px;background:var(--chip);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.wkBody{flex:1;overflow-y:auto;max-width:560px;width:100%;margin:0 auto;padding-top:12px}
+.exName{font-size:1.9rem;line-height:1.05;margin:4px 0}
+.fig{width:100%;height:auto;display:block;background:var(--chip);border-radius:14px;margin:10px 0}
+.fig .bd{stroke:var(--ink);stroke-width:5;stroke-linecap:round;fill:none}.fig .hd{fill:var(--ink)}.fig .db{fill:var(--accent)}.fig .pr{fill:var(--line)}.fig .br{stroke:var(--muted);stroke-width:4;stroke-linecap:round}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.95rem}
+.setNo{font-size:1.3rem}
+.tip{color:var(--muted);font-size:.95rem;margin:6px 0 0}
+.reps{display:flex;align-items:center;justify-content:center;gap:18px;margin:14px 0}
+.step{width:56px;height:56px;border-radius:50%;border:none;background:var(--chip);color:var(--ink);font-size:1.6rem;cursor:pointer}
+.repN{font-size:3rem;min-width:80px;text-align:center}
+.repL{text-align:center;color:var(--muted);margin-top:-10px;font-size:.9rem}
+.wkFoot{max-width:560px;width:100%;margin:0 auto}
+.rest{position:fixed;inset:0;z-index:40;background:var(--accent);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px}
+.rest[hidden]{display:none}
+.rest .t{font-size:5.5rem;line-height:1}
+.rest .nx{opacity:.85;text-align:center}
+.rest .row{display:flex;gap:10px;margin-top:14px}
+.rest button{border:2px solid #fff;background:transparent;color:#fff;border-radius:12px;padding:10px 16px;font:700 1.05rem "Barlow Condensed",sans-serif;cursor:pointer}
+.hist .d{font-weight:600}.hist .s{color:var(--muted);font-size:.92rem;margin:2px 0}
+.empty{color:var(--muted);text-align:center;padding:40px 10px}
+.prog{display:flex;align-items:flex-end;gap:4px;height:60px;margin-top:8px}
+.prog i{flex:1;background:var(--accent);border-radius:3px 3px 0 0;min-height:3px}
+.more a{display:block;color:var(--ink);text-decoration:none;padding:10px 0;border-bottom:1px solid var(--line)}
+.more a:last-child{border:none}.more small{display:block;color:var(--muted)}
+label.r{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+select{font:inherit;background:var(--chip);color:var(--ink);border:none;border-radius:8px;padding:6px 8px}
+.danger{color:#D64545;background:none;border:none;font:inherit;padding:8px 0;cursor:pointer}
+</style>
+</head>
+<body>
+<section class="screen" id="s-prog"><div class="wrap">
+  <h1 class="cond">Omuz & Göğüs</h1>
+  <p class="sub">Haftada 2 gün, arada en az 48 saat.</p>
+  <div id="days"></div>
+</div></section>
+
+<section class="screen" id="s-hist" hidden><div class="wrap">
+  <h1 class="cond">Geçmiş</h1>
+  <div id="histBody"></div>
+</div></section>
+
+<section class="screen" id="s-more" hidden><div class="wrap">
+  <h1 class="cond">Daha fazla</h1>
+  <div class="card"><h2 class="cond" style="margin:0 0 6px">Ayarlar</h2>
+    <label class="r">Normal hareketlerde dinlenme <select id="restMain"><option>60</option><option selected>90</option><option>120</option></select></label>
+    <label class="r">İzole hareketlerde dinlenme <select id="restIso"><option>45</option><option selected>60</option><option>90</option></select></label>
+  </div>
+  <div class="card more"><h2 class="cond" style="margin:0 0 4px">İlerleyince ekle</h2><div id="moreList"></div></div>
+  <div class="card"><h2 class="cond" style="margin:0 0 4px">Hatırlatmalar</h2>
+    <p>İlk 1–2 hafta her hareketten bir set eksik yap.</p>
+    <p>8 kilo hafif gelince inişi 3–4 saniyede yap, en zor noktada 1–2 saniye bekle.</p>
+    <p>Hedef tekrarı rahat yapınca bir zor varyasyona geç.</p></div>
+  <button class="danger" id="wipe">Tüm geçmişi sil</button>
+</div></section>
+
+<nav class="tb">
+  <button data-s="prog" aria-current="page"><span>🏋️</span>Program</button>
+  <button data-s="hist"><span>📈</span>Geçmiş</button>
+  <button data-s="more"><span>⚙️</span>Daha fazla</button>
+</nav>
+
+<section id="wk" hidden>
+  <div class="wkTop"><button class="x" id="quit" aria-label="Antrenmanı bitir">✕</button><div class="bar"><i id="pbar"></i></div></div>
+  <div class="wkBody" id="wkBody"></div>
+  <div class="wkFoot"><button class="btn" id="doneSet">Seti tamamla</button></div>
+</section>
+
+<div class="rest" id="rest" hidden>
+  <div class="cond" style="font-size:1.3rem">Dinlen</div>
+  <div class="t cond" id="rt">90</div>
+  <div class="nx" id="rnx"></div>
+  <div class="row"><button id="rminus">−15 sn</button><button id="rplus">+15 sn</button><button id="rskip">Geç</button></div>
+</div>
+
+<script>
+const days={
+ gun1:{t:"Gün 1 · Omuz",ex:[
+  {n:"Pike Push-Up (ayaklar bench'te)",s:3,r:8,k:"pike",c:1,tip:"Kalçalar yukarıda, başını ellerinin önüne indir.",u:"bodyweight"},
+  {n:"Seated Dumbbell Press",s:3,r:12,k:"press",c:1,tip:"Yavaş iniş, yukarıda dirseği kilitleme."},
+  {n:"Lateral Raise",s:3,r:15,k:"lateral",c:0,tip:"Eller omuz hizasını geçmesin."},
+  {n:"Barfiks / Negatif",s:4,r:5,k:"pullup",c:1,tip:"Negatifte üstten başla, 3–5 saniyede in."},
+  {n:"Bent-Over Lateral Raise",s:3,r:15,k:"rear",c:0,tip:"Gövde yere paralel, kolları yanlara aç."}]},
+ gun2:{t:"Gün 2 · Göğüs",ex:[
+  {n:"Decline Şınav",s:3,r:12,k:"decline",c:1,tip:"Ayaklar bench'te, vücut düz bir çizgi."},
+  {n:"Dumbbell Bench Press",s:3,r:15,k:"bench",c:1,tip:"Yavaş tempo, ayaklar yerde."},
+  {n:"Tek Kol Dumbbell Row",s:3,r:12,k:"row",c:1,tip:"Her kol için ayrı. Dirseği kalçaya çek."},
+  {n:"Lateral Raise",s:3,r:15,k:"lateral",c:0,tip:""},
+  {n:"Asılı Diz Çekme",s:3,r:10,k:"knee",c:0,tip:"Sallanmadan, dizleri göğse çek."}]}
+};
+const B="https://smartworkout.app/en/exercise-library/";
+const more=[["Pike Push-Up","shoulders/pike-push-up","Bench'li versiyon zorsa"],["Chin-Up","back/chin-up","Barfiksin kolay hali"],["Dead Hang","forearms/dead-hang","Asılı kalma"],["Pull-Up","back/pull-up","Negatiften sonra"],["Wall Walk","shoulders/wall-walk","Amuta giriş"],["Handstand Hold","shoulders/handstand-hold","Duvarda amut"],["Handstand Push-Up","shoulders/handstand-push-up","Uzun vadeli hedef"],["Archer Push-Up","chest/archer-push-up","Şınav ilerlemesi"]];
+const J=["H","N","P","E1","W1","E2","W2","K1","A1","K2","A2"];
+function sym(o){return Object.assign({E2:o.E1,W2:o.W1,K2:o.K1,A2:o.A1},o)}
+function mir(o){const r=Object.assign({},o);if(o.E1){r.E2=[200-o.E1[0],o.E1[1]];r.W2=[200-o.W1[0],o.W1[1]]}if(o.K1){r.K2=[200-o.K1[0],o.K1[1]];r.A2=[200-o.A1[0],o.A1[1]]}return r}
+const A={
+ pike:{props:'<rect class="pr" x="135" y="106" width="45" height="24" rx="3"/>',db:[],
+  a:sym({H:[60,98],N:[66,88],P:[118,58],E1:[63,109],W1:[60,130],K1:[135,80],A1:[150,104]}),
+  b:sym({H:[56,119],N:[66,110],P:[118,62],E1:[82,117],W1:[60,130],K1:[135,82],A1:[150,104]})},
+ press:{props:'<rect class="pr" x="70" y="100" width="60" height="12" rx="3"/>',db:[1,2],
+  a:mir({H:[100,40],N:[100,56],P:[100,98],E1:[72,74],W1:[72,50],K1:[80,104],A1:[78,130]}),
+  b:mir({H:[100,40],N:[100,56],P:[100,98],E1:[78,36],W1:[86,16],K1:[80,104],A1:[78,130]})},
+ lateral:{props:'',db:[1,2],
+  a:mir({H:[100,28],N:[100,44],P:[100,86],E1:[89,66],W1:[87,86],K1:[93,108],A1:[90,130]}),
+  b:mir({H:[100,28],N:[100,44],P:[100,86],E1:[76,47],W1:[56,50],K1:[93,108],A1:[90,130]})},
+ pullup:{props:'',bar:15,db:[],
+  a:mir({H:[100,42],N:[100,56],P:[100,96],E1:[90,37],W1:[80,17],K1:[97,116],A1:[97,134]}),
+  b:mir({H:[100,8],N:[100,24],P:[100,64],E1:[72,32],W1:[80,17],K1:[97,84],A1:[97,104]})},
+ rear:{props:'',db:[1],
+  a:sym({H:[56,70],N:[70,74],P:[112,70],E1:[72,90],W1:[72,108],K1:[116,100],A1:[112,130]}),
+  b:sym({H:[56,70],N:[70,74],P:[112,70],E1:[74,74],W1:[76,64],K1:[116,100],A1:[112,130]})},
+ decline:{props:'<rect class="pr" x="140" y="106" width="45" height="24" rx="3"/>',db:[],
+  a:sym({H:[56,84],N:[66,88],P:[110,96],E1:[64,109],W1:[62,130],K1:[130,100],A1:[150,104]}),
+  b:sym({H:[54,110],N:[66,112],P:[110,106],E1:[84,114],W1:[62,130],K1:[130,105],A1:[150,104]})},
+ bench:{props:'<rect class="pr" x="50" y="96" width="100" height="10" rx="3"/><rect class="pr" x="95" y="106" width="10" height="24"/>',db:[1],
+  a:sym({H:[58,86],N:[72,90],P:[126,90],E1:[84,104],W1:[76,80],K1:[152,72],A1:[156,130]}),
+  b:sym({H:[58,86],N:[72,90],P:[126,90],E1:[74,64],W1:[74,40],K1:[152,72],A1:[156,130]})},
+ row:{props:'<rect class="pr" x="40" y="100" width="110" height="10" rx="3"/><rect class="pr" x="90" y="110" width="10" height="20"/>',db:[1],
+  a:{H:[58,72],N:[70,76],P:[116,76],E1:[82,96],W1:[84,116],E2:[67,88],W2:[64,100],K1:[124,104],A1:[126,130],K2:[112,100],A2:[142,100]},
+  b:{H:[58,72],N:[70,76],P:[116,76],E1:[100,66],W1:[90,86],E2:[67,88],W2:[64,100],K1:[124,104],A1:[126,130],K2:[112,100],A2:[142,100]}},
+ knee:{props:'',bar:15,db:[],
+  a:sym({H:[100,40],N:[100,54],P:[100,94],E1:[100,36],W1:[100,17],K1:[100,114],A1:[100,134]}),
+  b:sym({H:[100,40],N:[100,54],P:[102,92],E1:[100,36],W1:[100,17],K1:[126,78],A1:[118,102]})}
+};
+
+function lerp(p,q,t){return [p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t]}
+function figSVG(k){const a=A[k];return `<svg class="fig" viewBox="0 0 200 140" role="img" aria-label="Hareket animasyonu">${a.bar?`<line class="br" x1="55" y1="${a.bar}" x2="145" y2="${a.bar}"/>`:''}<line class="br" x1="10" y1="131" x2="190" y2="131" style="stroke:var(--line)"/>${a.props}<path class="bd far" style="opacity:.45"/><path class="bd near"/><circle class="hd" r="9"/><g class="dbs"></g></svg>`}
+function draw(f,t){const a=A[f.k],P={};J.forEach(j=>P[j]=lerp(a.a[j],a.b[j],t));const L=(...k)=>"M"+k.map(x=>P[x].join(",")).join("L");
+ f.near.setAttribute("d",L("N","P")+" "+L("N","E1","W1")+" "+L("P","K1","A1"));f.far.setAttribute("d",L("N","E2","W2")+" "+L("P","K2","A2"));
+ f.head.setAttribute("cx",P.H[0]);f.head.setAttribute("cy",P.H[1]);
+ f.dbs.innerHTML=a.db.map(i=>{const w=P["W"+i];return `<rect class="db" x="${w[0]-9}" y="${w[1]-4}" width="18" height="8" rx="3"/>`}).join("")}
+let fig=null;const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function mountFig(el,k){const sv=el.querySelector("svg");fig={k,near:sv.querySelector(".near"),far:sv.querySelector(".far"),head:sv.querySelector(".hd"),dbs:sv.querySelector(".dbs")};draw(fig,reduce?1:0)}
+function tick(ts){if(fig&&!reduce){let x=(ts/1000%2.6)/2.6;let t=x<.45?x/.45:x<.55?1:x<.95?1-(x-.55)/.4:0;draw(fig,t*t*(3-2*t))}requestAnimationFrame(tick)}
+requestAnimationFrame(tick);
+
+// storage
+const get=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let hist=get("hist",[]),cfg=get("cfg",{m:90,i:60});
+const fmt=d=>new Date(d).toLocaleDateString("tr-TR",{day:"numeric",month:"long",weekday:"short"});
+function lastFor(day,i){for(let j=hist.length-1;j>=0;j--)if(hist[j].day===day&&hist[j].ex[i])return hist[j].ex[i];return null}
+
+// program screen
+function renderDays(){const el=document.getElementById("days");el.innerHTML="";
+ for(const [id,d] of Object.entries(days)){const last=hist.filter(h=>h.day===id).pop();
+  const c=document.createElement("div");c.className="card day";
+  c.innerHTML=`<h2 class="cond">${d.t}</h2><ul>${d.ex.map(e=>`<li>${e.n} · ${e.s}×${e.r}</li>`).join("")}</ul>
+   <p class="last">${last?"Son: "+fmt(last.date):"Henüz yapılmadı"}</p><button class="btn">Başla</button>`;
+  c.querySelector("button").onclick=()=>start(id);el.appendChild(c)}}
+
+// workout
+let W=null;
+function start(id){W={day:id,i:0,set:0,log:days[id].ex.map(()=>[]),date:Date.now()};
+ document.getElementById("wk").hidden=false;showEx();try{navigator.wakeLock&&navigator.wakeLock.request("screen").then(l=>W.lock=l)}catch(e){}}
+function totalSets(){return days[W.day].ex.reduce((a,e)=>a+e.s,0)}
+function doneSets(){return W.log.reduce((a,l)=>a+l.length,0)}
+function showEx(){const e=days[W.day].ex[W.i];const prev=lastFor(W.day,W.i);
+ W.reps=W.reps??(prev&&prev[W.set]?prev[W.set]:e.r);
+ const b=document.getElementById("wkBody");
+ b.innerHTML=`<div class="meta"><span>Hareket ${W.i+1}/${days[W.day].ex.length}</span><span>${days[W.day].t}</span></div>
+  <div class="exName cond">${e.n}</div>${figSVG(e.k)}
+  <div class="meta"><span class="setNo cond">Set ${W.set+1}/${e.s}</span><span>Hedef ${e.r} tekrar</span></div>
+  ${e.tip?`<p class="tip">${e.tip}</p>`:""}
+  ${prev?`<p class="tip">Geçen sefer: ${prev.join(", ")}</p>`:""}
+  <div class="reps"><button class="step" id="m">−</button><div class="repN cond" id="rn">${W.reps}</div><button class="step" id="p">+</button></div>
+  <div class="repL">yaptığın tekrar</div>`;
+ mountFig(b,e.k);
+ b.querySelector("#m").onclick=()=>{W.reps=Math.max(0,W.reps-1);b.querySelector("#rn").textContent=W.reps};
+ b.querySelector("#p").onclick=()=>{W.reps++;b.querySelector("#rn").textContent=W.reps};
+ document.getElementById("pbar").style.width=(doneSets()/totalSets()*100)+"%";
+ document.getElementById("doneSet").textContent=(W.i===days[W.day].ex.length-1&&W.set===e.s-1)?"Antrenmanı bitir":"Seti tamamla"}
+document.getElementById("doneSet").onclick=()=>{const ex=days[W.day].ex,e=ex[W.i];
+ W.log[W.i].push(W.reps);W.set++;W.reps=null;
+ if(W.set>=e.s){W.i++;W.set=0}
+ if(W.i>=ex.length)return finish();
+ const n=ex[W.i];rest(e.c?cfg.m:cfg.i,`Sıradaki: ${n.n} · Set ${W.set+1}/${n.s}`)};
+function finish(save=true){if(save&&doneSets()>0){hist.push({day:W.day,date:W.date,ex:W.log});put("hist",hist)}
+ try{W.lock&&W.lock.release()}catch(e){}fig=null;W=null;document.getElementById("wk").hidden=true;renderDays();renderHist();if(save)go("hist")}
+document.getElementById("quit").onclick=()=>{if(doneSets()===0||confirm("Antrenmanı bitirip şimdiye kadarki setleri kaydedeyim mi?"))finish(doneSets()>0)};
+
+// rest timer
+let rT=0,rEnd=0,rInt=null;
+function rest(sec,next){rEnd=Date.now()+sec*1000;document.getElementById("rnx").textContent=next;document.getElementById("rest").hidden=false;showEx();upd();clearInterval(rInt);rInt=setInterval(upd,250)}
+function upd(){const s=Math.max(0,Math.ceil((rEnd-Date.now())/1000));document.getElementById("rt").textContent=s;if(s===0)endRest(true)}
+function endRest(buzz){clearInterval(rInt);document.getElementById("rest").hidden=true;if(buzz){try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}beep()}}
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.value=.15;o.start();o.stop(a.currentTime+.25)}catch(e){}}
+document.getElementById("rskip").onclick=()=>endRest(false);
+document.getElementById("rplus").onclick=()=>{rEnd+=15000;upd()};
+document.getElementById("rminus").onclick=()=>{rEnd-=15000;upd()};
+
+// history
+function renderHist(){const el=document.getElementById("histBody");
+ if(!hist.length){el.innerHTML='<p class="empty">İlk antrenmanını bitirince burada görünecek.</p>';return}
+ let h="";const totals=hist.slice(-12).map(x=>x.ex.flat().reduce((a,b)=>a+b,0)),mx=Math.max(...totals);
+ h+=`<div class="card"><div class="cond" style="font-size:1.3rem">Toplam tekrar (son ${totals.length} antrenman)</div><div class="prog">${totals.map(t=>`<i style="height:${t/mx*100}%"></i>`).join("")}</div></div>`;
+ [...hist].reverse().forEach(x=>{const d=days[x.day];
+  h+=`<div class="card hist"><div class="d">${fmt(x.date)} · ${d.t}</div>${d.ex.map((e,i)=>x.ex[i]&&x.ex[i].length?`<div class="s">${e.n}: ${x.ex[i].join(", ")}</div>`:"").join("")}</div>`});
+ el.innerHTML=h}
+
+// tabs
+function go(s){document.querySelectorAll(".screen").forEach(x=>x.hidden=x.id!=="s-"+s);
+ document.querySelectorAll(".tb button").forEach(b=>{if(b.dataset.s===s)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})}
+document.querySelectorAll(".tb button").forEach(b=>b.onclick=()=>go(b.dataset.s));
+
+// settings & extras
+const rm=document.getElementById("restMain"),ri=document.getElementById("restIso");rm.value=cfg.m;ri.value=cfg.i;
+rm.onchange=()=>{cfg.m=+rm.value;put("cfg",cfg)};ri.onchange=()=>{cfg.i=+ri.value;put("cfg",cfg)};
+document.getElementById("moreList").innerHTML=more.map(([n,p,d])=>`<a href="${B+p}" target="_blank" rel="noopener">${n} ↗<small>${d}</small></a>`).join("");
+document.getElementById("wipe").onclick=()=>{if(confirm("Tüm antrenman geçmişi silinsin mi? Geri alınamaz.")){hist=[];put("hist",hist);renderHist();renderDays()}};
+
+renderDays();renderHist();
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+</script>
+</body>
+</html>
